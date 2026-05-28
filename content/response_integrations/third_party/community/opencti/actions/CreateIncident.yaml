@@ -1,0 +1,46 @@
+name: Create Incident
+description: Create an incident in OpenCTI
+integration_identifier: OpenCTI
+parameters:
+-   name: Name
+    default_value: ''
+    type: string
+    description: Specify the name of the incident
+    is_mandatory: true
+-   name: Description
+    default_value: ''
+    type: string
+    description: Specify the description of the incident
+    is_mandatory: false
+-   name: Severity
+    default_value: ''
+    type: string
+    description: Specify the severity of the incident
+    is_mandatory: false
+-   name: Type
+    default_value: Alert
+    type: string
+    description: Specify the type of the incident
+    is_mandatory: false
+-   name: Labels
+    default_value: ''
+    type: string
+    description: Specify labels to apply, comma-separated (e.g. label1, label2)'
+    is_mandatory: false
+-   name: Marking
+    default_value: TLP:AMBER
+    type: ddl
+    optional_values:
+        - TLP:CLEAR
+        - TLP:GREEN
+        - TLP:AMBER
+        - TLP:AMBER+STRICT
+        - TLP:RED
+    description: Specify the marking of the incident
+    is_mandatory: false
+dynamic_results_metadata:
+-   result_example_path: resources/CreateIncident_JsonResult_example.json
+    result_name: JsonResult
+    show_result: true
+default_result_value: ''
+creator: b63f7d49-7b62-40be-b967-9a713b7085b0

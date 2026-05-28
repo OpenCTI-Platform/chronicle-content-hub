@@ -1,0 +1,26 @@
+{
+  "id": "154cf83a-58ba-4b94-8597-11a8033644aa",
+  "standard_id": "domain-name--1072365c-9b33-5553-87f3-ef925e2ef305",
+  "entity_type": "Domain-Name",
+  "parent_types":
+  [
+    "Basic-Object",
+    "Stix-Object",
+    "Stix-Core-Object",
+    "Stix-Cyber-Observable"
+  ],
+  "indicators":
+  [
+    {
+      "id": "b7da5a7f-13c3-4988-bdf2-8dc2196eebaf",
+      "pattern": "[domain-name:value = 'www.domain-example.com']",
+      "pattern_type": "stix",
+      "createdById": null
+    }
+  ],
+  "createdById": null,
+  "indicatorsIds":
+  [
+    "b7da5a7f-13c3-4988-bdf2-8dc2196eebaf"
+  ]
+}

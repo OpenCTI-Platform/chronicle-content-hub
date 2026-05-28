@@ -1,0 +1,15 @@
+{
+  "id": "ee7acbe6-72bb-406a-9243-a8c8a2654d05",
+  "standard_id": "case-incident--59853d72-6a61-5c3e-866e-98dee8a3f2f6",
+  "entity_type": "Case-Incident",
+  "parent_types":
+  [
+    "Basic-Object",
+    "Stix-Object",
+    "Stix-Core-Object",
+    "Stix-Domain-Object",
+    "Container",
+    "Case"
+  ],
+  "createdById": null
+}

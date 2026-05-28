@@ -1,0 +1,59 @@
+name: Create Observable
+description: 'Create a new STIX cyber observable in OpenCTI'
+integration_identifier: OpenCTI
+parameters:
+-   name: Observable Value
+    default_value: ''
+    type: string
+    description: Value of the observable
+    is_mandatory: true
+-   name: Observable Type
+    default_value: domain
+    type: ddl
+    optional_values:
+    - domain
+    - url
+    - hostname
+    - email-subject
+    - email-addr
+    - ip
+    - hash
+    description: Type of the observable
+    is_mandatory: true
+-   name: Description
+    default_value: ''
+    type: string
+    description: Observable description
+    is_mandatory: false
+-   name: Score
+    default_value: '50'
+    type: string
+    description: Threat score (0-100)
+    is_mandatory: false
+-   name: Labels
+    default_value: ''
+    type: string
+    description: Comma-separated list of labels
+    is_mandatory: false
+-   name: Marking
+    default_value: TLP:AMBER
+    type: ddl
+    optional_values:
+      - TLP:CLEAR
+      - TLP:GREEN
+      - TLP:AMBER
+      - TLP:AMBER+STRICT
+      - TLP:RED
+    description: Marking definition to apply
+    is_mandatory: false
+-   name: Create Indicator
+    default_value: 'false'
+    type: boolean
+    description: Create an indicator from this observable
+    is_mandatory: false
+dynamic_results_metadata:
+-   result_example_path: null
+    result_name: JsonResult
+    show_result: true
+default_result_value: ''
+creator: b63f7d49-7b62-40be-b967-9a713b7085b0

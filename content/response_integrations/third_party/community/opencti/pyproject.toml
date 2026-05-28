@@ -1,0 +1,28 @@
+[project]
+name = "OpenCTI"
+version = "1.0"
+description = "OpenCTI integration for Chronicle SOAR"
+requires-python = ">=3.11"
+dependencies = [
+    "pycti",
+    "antlr4-python3-runtime==4.9.3",
+    "tipcommon",
+    "environmentcommon",
+]
+
+[dependency-groups]
+dev = [
+    "environmentcommon",
+    "soar-sdk",
+    "tipcommon",
+    "pytest",
+    "pytest-json-report"
+]
+
+[tool.uv.sources]
+soar-sdk = { git = "https://github.com/chronicle/soar-sdk.git" }
+pycti = { url = "https://files.pythonhosted.org/packages/da/5c/95d845f79d86b6b6d7f766da2eeb2997dd32d87732c0e6b4e95d7e08e01d/pycti-6.9.15-py3-none-any.whl" }
+antlr4-python3-runtime = { url = "https://files.pythonhosted.org/packages/3e/38/7859ff46355f76f8d19459005ca000b6e7012f2f1ca597746cbcd1fbfe5e/antlr4-python3-runtime-4.9.3.tar.gz" }
+tipcommon = { path = "../../../../../packages/tipcommon/whls/TIPCommon-2.3.6-py3-none-any.whl" }
+environmentcommon = { path = "../../../../../packages/envcommon/whls/EnvironmentCommon-1.0.3-py3-none-any.whl" }
+
