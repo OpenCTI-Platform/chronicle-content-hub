@@ -1,0 +1,30 @@
+name: Add Object to Container
+description: 'Add an object to an existing container'
+integration_identifier: OpenCTI
+parameters:
+- name: Container Type
+  default_value: 'report'
+  type: ddl
+  optional_values:
+      - report
+      - incident response case
+      - request for information
+      - grouping
+  description: Container Type
+  is_mandatory: true
+-   name: Container Id
+    default_value: ''
+    type: string
+    description: Container identifier
+    is_mandatory: true
+-   name: Object Id
+    default_value: ''
+    type: string
+    description: Object identifier
+    is_mandatory: true
+dynamic_results_metadata:
+-   result_example_path:
+    result_name: JsonResult
+    show_result: true
+default_result_value: ''
+creator: b63f7d49-7b62-40be-b967-9a713b7085b0

@@ -1,0 +1,156 @@
+[
+  {
+    "Entity": "win-adfs",
+    "EntityResult":
+    {
+      "id": "0e04ba01-c5c0-4d7c-9a29-32d5b4b6a84a",
+      "standard_id": "hostname--b52b2b30-12b2-5229-92b8-d99efb16112f",
+      "entity_type": "Hostname",
+      "parent_types":
+      [
+        "Basic-Object",
+        "Stix-Object",
+        "Stix-Core-Object",
+        "Stix-Cyber-Observable"
+      ],
+      "indicators":
+      [
+        {
+          "id": "c3e4e71f-f897-4b3c-a1fc-5e62a763477a",
+          "pattern": "[hostname:value = 'win-adfs']",
+          "pattern_type": "stix",
+          "createdById": null
+        }
+      ],
+      "createdById": null,
+      "indicatorsIds":
+      [
+        "c3e4e71f-f897-4b3c-a1fc-5e62a763477a"
+      ]
+    }
+  },
+  {
+    "Entity": "phil.aldrin",
+    "EntityResult": null
+  },
+  {
+    "Entity": "10.128.0.21",
+    "EntityResult":
+    {
+      "id": "575ed6e0-fff2-47e3-8b9e-dab6e25fa679",
+      "standard_id": "ipv4-addr--40a44c51-45c2-55f7-b755-ee5ae78187a9",
+      "entity_type": "IPv4-Addr",
+      "parent_types":
+      [
+        "Basic-Object",
+        "Stix-Object",
+        "Stix-Core-Object",
+        "Stix-Cyber-Observable"
+      ],
+      "indicators":
+      [
+        {
+          "id": "439ad6bb-5f90-4454-a65e-f3e61dba3047",
+          "pattern": "[ipv4-addr:value = '10.128.0.21']",
+          "pattern_type": "stix",
+          "createdById": null
+        }
+      ],
+      "createdById": null,
+      "indicatorsIds":
+      [
+        "439ad6bb-5f90-4454-a65e-f3e61dba3047"
+      ]
+    }
+  },
+  {
+    "Entity": "alphastand.win",
+    "EntityResult":
+    {
+      "id": "e054faac-6400-4785-91c9-1c561dd1acfe",
+      "standard_id": "hostname--39eb1b17-54f6-566e-861c-899c6667fa35",
+      "entity_type": "Hostname",
+      "parent_types":
+      [
+        "Basic-Object",
+        "Stix-Object",
+        "Stix-Core-Object",
+        "Stix-Cyber-Observable"
+      ],
+      "indicators":
+      [
+        {
+          "id": "f0d05703-689e-4a74-955e-ea0d864be62a",
+          "pattern": "[hostname:value = 'alphastand.win']",
+          "pattern_type": "stix",
+          "createdById": null
+        }
+      ],
+      "createdById": null,
+      "indicatorsIds":
+      [
+        "f0d05703-689e-4a74-955e-ea0d864be62a"
+      ]
+    }
+  },
+  {
+    "Entity": "185.189.112.157",
+    "EntityResult":
+    {
+      "id": "062a1057-3488-413c-b1c6-0f204bad3c12",
+      "standard_id": "ipv4-addr--298d8b4c-f9cc-5ca6-a617-27019f0bed00",
+      "entity_type": "IPv4-Addr",
+      "parent_types":
+      [
+        "Basic-Object",
+        "Stix-Object",
+        "Stix-Core-Object",
+        "Stix-Cyber-Observable"
+      ],
+      "indicators":
+      [
+        {
+          "id": "0bc3f0da-70e2-4b16-b63a-91936cf73c75",
+          "pattern": "[ipv4-addr:value = '185.189.112.157']",
+          "pattern_type": "stix",
+          "createdById": null
+        }
+      ],
+      "createdById": null,
+      "indicatorsIds":
+      [
+        "0bc3f0da-70e2-4b16-b63a-91936cf73c75"
+      ]
+    }
+  },
+  {
+    "Entity": "http://alphastand.win/alien/fre.php",
+    "EntityResult":
+    {
+      "id": "41985e6b-dbb5-4395-8bf4-83528b944e06",
+      "standard_id": "url--a41e9e57-f696-593a-8ee7-eabcade8a051",
+      "entity_type": "Url",
+      "parent_types":
+      [
+        "Basic-Object",
+        "Stix-Object",
+        "Stix-Core-Object",
+        "Stix-Cyber-Observable"
+      ],
+      "indicators":
+      [
+        {
+          "id": "83185db7-4030-475a-98b5-cf22738d02dd",
+          "pattern": "[url:value = 'http://alphastand.win/alien/fre.php']",
+          "pattern_type": "stix",
+          "createdById": null
+        }
+      ],
+      "createdById": null,
+      "indicatorsIds":
+      [
+        "83185db7-4030-475a-98b5-cf22738d02dd"
+      ]
+    }
+  }
+]
