@@ -2,6 +2,7 @@ from core.base_action import BaseAction
 from core.constants import CREATE_INCIDENT_RESPONSE_CASE_SCRIPT_NAME
 from core.utils import parse_csv_list
 from TIPCommon.extraction import extract_action_param
+from datetime import datetime, timezone
 
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {CREATE_INCIDENT_RESPONSE_CASE_SCRIPT_NAME}"
@@ -27,6 +28,15 @@ class CreateIncidentResponseCase(BaseAction):
             print_value=True,
             is_mandatory=False,
         )
+        self.params.created = extract_action_param(
+            self.soar_action,
+            param_name="Created At",
+            print_value=True,
+            is_mandatory=False,
+        )
+        if self.params.created is None:
+            self.params.created = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
         self.params.severity = extract_action_param(
             self.soar_action,
             param_name="Severity",
@@ -64,6 +74,7 @@ class CreateIncidentResponseCase(BaseAction):
         result = self.api_client.create_case_incident(
             name=self.params.name,
             description=self.params.description,
+            inc_date=self.params.created,
             inc_type=self.params.inc_type,
             severity=self.params.severity,
             priority=self.params.priority,

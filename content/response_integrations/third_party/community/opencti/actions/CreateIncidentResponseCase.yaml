@@ -12,6 +12,11 @@ parameters:
     type: string
     description: Specify the description of the incident response case
     is_mandatory: false
+-   name: Created At
+    default_value: ''
+    type: string
+    description: Specify the creation date of the incident response case
+    is_mandatory: false
 -   name: Severity
     default_value: ''
     type: string
