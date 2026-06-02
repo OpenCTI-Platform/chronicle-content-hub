@@ -63,9 +63,6 @@ class AddObjectToContainer(BaseAction):
         else:
             raise Exception(f"Unsupported container type: {self.params.container_type}")
 
-        import json
-        self.logger.info(json.dumps(result, indent=2))
-
         # Successful execution: the framework will keep execution_state=COMPLETED.
         # On any raised exception, the framework will:
         #   - log the exception
