@@ -1,7 +1,10 @@
 from __future__ import annotations
 INTEGRATION_NAME = "OpenCTI"
-OPENCTI_PREFIX = "OCTI"
+
+#OPENCTI_PREFIX = "OCTI"
 DEFAULT_LABEL_COLOR = "#2758d7"
+
+ENRICHMENT_PREFIX = "OCTI"
 
 GREEN_COLOR = "#339966"
 RED_COLOR = "#ff0000"
@@ -18,3 +21,14 @@ ADD_OBJECT_TO_CONTAINER_SCRIPT_NAME = f"{INTEGRATION_NAME} - Add Object to Conta
 ENRICH_ENTITIES_SCRIPT_NAME = f"{INTEGRATION_NAME} - Enrich Entities"
 ENRICH_INDICATORS_SCRIPT_NAME = f"{INTEGRATION_NAME} - Enrich Indicators"
 ENRICH_FILE_HASH_SCRIPT_NAME = f"{INTEGRATION_NAME} - Enrich File Hash"
+
+#
+EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+EMAIL_ENTITY_TYPE = 101
+
+IOC_MAPPING = {
+    "files": "file",
+    "urls": "url",
+    "ip_addresses": "ip-address",
+    "domains": "domain",
+}

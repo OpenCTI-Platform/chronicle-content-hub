@@ -1,5 +1,9 @@
 from __future__ import annotations
+
 from .datamodels import ObservableObject, IndicatorObject
+from constants import IOC_MAPPING
+import datamodels_bis
+from TIPCommon.types import SingleJson
 
 
 class OpenCTIParser:
@@ -89,4 +93,34 @@ class OpenCTIParser:
             detection=data.get("detection"),
             main_observable_type=data.get("main_observable_type"),
             link=link
+        )
+
+    def build_observable_object(self, raw_data: SingleJson, observable_type: str, observable: str, link: str):
+        """Build Observable dataclas
+
+        Args:
+            raw_data (dict): raw data dict
+            observable_type (str): observable type
+            observable (str): observable identifier
+            link (str): observable link
+        Returns:
+            data_models.Observable: Observable dataclass
+
+        """
+        observable_type = IOC_MAPPING.get(observable_type)
+        print(observable_type)
+        if observable_type == "ip-address":
+            return datamodels_bis.IP.from_json(
+                raw_data=raw_data, observable_type=observable_type, observable=observable, link=link
+            )
+        if observable_type == "url":
+            return datamodels_bis.URL.from_json(
+                raw_data=raw_data, observable_type=observable_type, observable=observable, link=link
+            )
+        if observable_type == "file":
+            return datamodels_bis.Hash.from_json(
+                raw_data=raw_data, observable_type=observable_type, observable=observable, link=link
+            )
+        return datamodels_bis.Domain.from_json(
+            raw_data=raw_data, observable_type=observable_type, observable=observable, link=link
         )

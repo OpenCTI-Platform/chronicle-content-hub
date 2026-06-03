@@ -4,7 +4,6 @@ from .utils import is_ipv4, get_hash_type
 from .OpenCTIParser import OpenCTIParser
 from .constants import DEFAULT_LABEL_COLOR
 
-
 class OpenCTIManagerAPI(object):
     
     def __init__(self, url, token, ssl_verify=True):
@@ -53,23 +52,36 @@ class OpenCTIManagerAPI(object):
         )
         return marking_definition
 
-    def search_observable(self, value):
+    def search_observable(
+        self,
+        observable: str,
+        observable_type: str,
+        raw_response: bool = False
+    ):
         """
-        :param value: str
-        :return: dict
+        :param observable:
+        :param observable_type:
+        :param raw_response:
+        :return:
         """
-        observable = self.opencti_api_client.stix_cyber_observable.read(
+        result = self.opencti_api_client.stix_cyber_observable.read(
             filters={
                 "mode": "and",
-                "filters": [{"key": "value", "values": [value]}],
+                "filters": [{"key": "value", "values": [observable]}],
                 "filterGroups": [],
             }
         )
-        if observable is None:
-            return None
-        else:
-            link = self.url+"/dashboard/id/"+observable["id"]
-            return self.parser.build_siemplify_observable_object(observable, link)
+        #if observable is None:
+        #    return None
+        #else:
+        #
+        #    return self.parser.build_siemplify_observable_object(observable, link)
+
+        print(result)
+        link = self.url+"/dashboard/id/"+result["id"]
+        if raw_response:
+            return result
+        return self.parser.build_observable_object(raw_data=result, observable_type=observable_type, observable=observable, link=link)
 
     def search_indicator(self, value):
         """
