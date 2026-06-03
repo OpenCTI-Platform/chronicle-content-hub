@@ -1,6 +1,7 @@
 from core.base_action import BaseAction
 from core.constants import CREATE_INCIDENT_SCRIPT_NAME
 from core.utils import parse_csv_list
+from core import utils
 from TIPCommon.extraction import extract_action_param
 from datetime import datetime, timezone
 
@@ -28,14 +29,16 @@ class CreateIncident(BaseAction):
             print_value=True,
             is_mandatory=False,
         )
-        self.params.created = extract_action_param(
+        created = extract_action_param(
             self.soar_action,
             param_name="Created At",
             print_value=True,
             is_mandatory=False,
         )
-        if self.params.created is None:
+        if created is None:
             self.params.created = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        else:
+            self.params.created = utils.convert_date_format(created)
 
         self.params.severity = extract_action_param(
             self.soar_action,
@@ -67,8 +70,8 @@ class CreateIncident(BaseAction):
         # create incident with GraphQL
         result = self.api_client.create_incident(
             name=self.params.name,
-            description=self.params.description,
             inc_date=self.params.created,
+            description=self.params.description,
             inc_type=self.params.inc_type,
             severity=self.params.severity,
             labels=self.params.labels,
