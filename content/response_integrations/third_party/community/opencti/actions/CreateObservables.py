@@ -1,7 +1,6 @@
-import json
 from core.base_action import BaseAction
-from core.constants import CREATE_OBSERVABLES_SCRIPT_NAME
-from core.utils import parse_csv_list
+from core.constants import CREATE_OBSERVABLES_SCRIPT_NAME, EMAIL_ENTITY_TYPE
+from core.utils import parse_csv_list, get_entity_type
 from TIPCommon.extraction import extract_action_param
 from SiemplifyDataModel import EntityTypes
 from TIPCommon.utils import get_entity_original_identifier
@@ -17,20 +16,19 @@ SUPPORTED_ENTITIES = [
     EntityTypes.HOSTNAME,
     EntityTypes.DOMAIN,
     EntityTypes.USER,
-    #EntityTypes.FILENAME,
-    #EntityTypes.EMAILMESSAGE
+    EntityTypes.FILENAME,
+    EntityTypes.EMAILMESSAGE
 ]
 
 entity_type_mapper = {
     EntityTypes.HOSTNAME: "hostname",
     EntityTypes.URL: "url",
-    EntityTypes.FILEHASH: "file",
-    EntityTypes.ADDRESS: "ip",
-    EntityTypes.USER: "email-addr",
+    EntityTypes.FILEHASH: "hash",
     EntityTypes.FILENAME: "filename",
+    EntityTypes.ADDRESS: "ip",
     EntityTypes.DOMAIN: "domain",
-    #EntityTypes.EMAILMESSAGE: "email-message"
-
+    EntityTypes.EMAILMESSAGE: "email-message",
+    EMAIL_ENTITY_TYPE: "email-addr",
 }
 
 class CreateObservables(BaseAction):
@@ -81,30 +79,18 @@ class CreateObservables(BaseAction):
         # create observables with GraphQL for all supported entities in this run
         successful_entities = []
         failed_entities = []
-        #json_results = []
         self.json_results = {}
-
-        self.logger.info("target entities")
-        self.logger.info(self.soar_action.target_entities)
-
-        for entity in self.soar_action.target_entities:
-            self.logger.info(entity.entity_type)
 
         suitable_entities = [
             entity
             for entity in self.soar_action.target_entities
             if entity.entity_type in SUPPORTED_ENTITIES
         ]
-        self.logger.info("suitable entities")
-        self.logger.info(suitable_entities)
         for entity in suitable_entities:
-            self.logger.info("entity")
-            self.logger.info(entity)
             identifier = get_entity_original_identifier(entity)
-            self.logger.info(identifier)
+            prepared_entity_type = get_entity_type(entity)
             try:
-                observable_type = entity_type_mapper[entity.entity_type]
-                self.logger.info(observable_type)
+                observable_type = entity_type_mapper[prepared_entity_type]
                 result = self.api_client.create_observable(
                     obs_value=identifier,
                     obs_type=observable_type,
@@ -114,16 +100,11 @@ class CreateObservables(BaseAction):
                     marking_str=self.params.marking,
                     create_indicator=self.params.create_indicator,
                 )
-                self.logger.info(result)
-
-                self.logger.info(
-                    f"Observable created for '{identifier}' ({observable_type})\n"
-                    f"{json.dumps(result, indent=2)}"
-                )
-
-                successful_entities.append(identifier)
-                self.json_results.update({identifier: result})
-                #json_results.append(result)
+                if result:
+                    successful_entities.append(identifier)
+                    self.json_results.update({identifier: result})
+                else:
+                    failed_entities.append(identifier)
 
             except Exception as err:
                 self.logger.exception(
@@ -156,23 +137,6 @@ class CreateObservables(BaseAction):
                 "No observables were created for the provided entities"
                 f" in {CREATE_OBSERVABLES_SCRIPT_NAME}."
             )
-
-        """
-        output_parts = []
-        if successful_entities:
-            output_parts.append(
-                "Successfully created observables for: "
-                + ", ".join(successful_entities)
-            )
-        if failed_entities:
-            output_parts.append(
-                "Failed to create observables for: "
-                + ", ".join(failed_entities)
-            )
-
-        self.output_message = "\n".join(output_parts)
-        """
-        self.logger.info(json.dumps(self.json_results))
 
 def main() -> None:
     """Entry point for executing the "Create Observables" action script.

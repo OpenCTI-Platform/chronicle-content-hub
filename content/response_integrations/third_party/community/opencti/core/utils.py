@@ -70,6 +70,7 @@ def parse_csv_list(value: str | None, separator: str = ",") -> list[str]:
         return []
     return [item.strip() for item in value.split(separator) if item and item.strip()]
 
+
 def get_entity_type(entity: Entity) -> str:
     """Helper function to get entity type
 
