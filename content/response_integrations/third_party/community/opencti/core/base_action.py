@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from abc import ABC
 
+from core.constants import INTEGRATION_NAME
 from OpenCTIManager import OpenCTIManagerAPI
 from TIPCommon.base.action import Action
-from TIPCommon.extraction import extract_script_param, extract_configuration_param
-
-from core.constants import INTEGRATION_NAME
+from TIPCommon.extraction import extract_configuration_param
 
 
 class BaseAction(Action, ABC):

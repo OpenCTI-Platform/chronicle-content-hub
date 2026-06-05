@@ -6,6 +6,7 @@ from TIPCommon.extraction import extract_action_param
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {CREATE_OBSERVABLE_SCRIPT_NAME}"
 
+
 class CreateObservable(BaseAction):
     def __init__(self, script_name: str) -> None:
         super().__init__(script_name)
@@ -98,6 +99,7 @@ class CreateObservable(BaseAction):
         # at the end of run() if the dict is non-empty.
         self.json_results = result or {}
 
+
 def main() -> None:
     """Entry point for executing the "Create Observable" action script.
 
@@ -105,6 +107,7 @@ def main() -> None:
     the predefined script name and triggers its execution.
     """
     CreateObservable(CREATE_OBSERVABLE_SCRIPT_NAME).run()
+
 
 if __name__ == "__main__":
     main()

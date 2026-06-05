@@ -1,12 +1,14 @@
+from datetime import datetime, timezone
+
+from core import utils
 from core.base_action import BaseAction
 from core.constants import CREATE_INCIDENT_SCRIPT_NAME
 from core.utils import parse_csv_list
-from core import utils
 from TIPCommon.extraction import extract_action_param
-from datetime import datetime, timezone
 
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {CREATE_INCIDENT_SCRIPT_NAME}"
+
 
 class CreateIncident(BaseAction):
     def __init__(self, script_name: str) -> None:
@@ -96,6 +98,7 @@ class CreateIncident(BaseAction):
         # at the end of run() if the dict is non-empty.
         self.json_results = result or {}
 
+
 def main() -> None:
     """Entry point for executing the "Create Incident" action script.
 
@@ -103,6 +106,7 @@ def main() -> None:
     the predefined script name and triggers its execution.
     """
     CreateIncident(CREATE_INCIDENT_SCRIPT_NAME).run()
+
 
 if __name__ == "__main__":
     main()

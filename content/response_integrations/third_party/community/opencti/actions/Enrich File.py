@@ -1,19 +1,17 @@
 from __future__ import annotations
+
+from soar_sdk.ScriptResult import EXECUTION_STATE_COMPLETED, EXECUTION_STATE_FAILED
 from soar_sdk.SiemplifyAction import SiemplifyAction
-from soar_sdk.SiemplifyUtils import unix_now, convert_unixtime_to_datetime, output_handler
-from soar_sdk.ScriptResult import EXECUTION_STATE_COMPLETED, EXECUTION_STATE_FAILED,EXECUTION_STATE_TIMEDOUT
-from ..core.constants import INTEGRATION_NAME, ENRICH_FILE_HASH_SCRIPT_NAME, OPENCTI_PREFIX
-from ..core.utils import get_entity_original_identifier
 from soar_sdk.SiemplifyDataModel import EntityTypes
-from ..core.OpenCTIManager import OpenCTIManagerAPI
 from soar_sdk.SiemplifyUtils import (
-    add_prefix_to_dict_keys,
     convert_dict_to_json_result_dict,
-    dict_to_flat,
     output_handler,
 )
-from TIPCommon import extract_configuration_param, extract_action_param, construct_csv, flat_dict_to_csv
+from TIPCommon import extract_configuration_param, flat_dict_to_csv
 
+from ..core.constants import ENRICH_FILE_HASH_SCRIPT_NAME, INTEGRATION_NAME, OPENCTI_PREFIX
+from ..core.OpenCTIManager import OpenCTIManagerAPI
+from ..core.utils import get_entity_original_identifier
 
 SUPPORTED_ENTITY_TYPES = [
     EntityTypes.FILEHASH,
@@ -62,7 +60,7 @@ def main():
     suitable_entities = [
         entity
         for entity in siemplify.target_entities
-        if entity.entity_type ==  EntityTypes.FILEHASH
+        if entity.entity_type == EntityTypes.FILEHASH
     ]
 
     siemplify.LOGGER.info(
@@ -113,9 +111,9 @@ def main():
                 # Fill json with every entity data
                 json_results[get_entity_original_identifier(entity)] = result
                 
-                #json_results[get_entity_original_identifier(entity)].update(
+                # json_results[get_entity_original_identifier(entity)].update(
                 #  {"execution_status": "success"}
-                #)
+                # )
                 create_insight = True
                 if result and create_insight:
                     

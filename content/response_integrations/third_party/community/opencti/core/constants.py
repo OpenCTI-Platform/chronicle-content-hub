@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 INTEGRATION_NAME = "OpenCTI"
 
-#OPENCTI_PREFIX = "OCTI"
+# OPENCTI_PREFIX = "OCTI"
 DEFAULT_LABEL_COLOR = "#2758d7"
 
 ENRICHMENT_PREFIX = "OCTI"

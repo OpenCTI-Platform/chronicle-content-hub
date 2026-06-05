@@ -1,10 +1,10 @@
 from core.base_action import BaseAction
 from core.constants import CREATE_OBSERVABLES_SCRIPT_NAME, EMAIL_ENTITY_TYPE
-from core.utils import parse_csv_list, get_entity_type
-from TIPCommon.extraction import extract_action_param
+from core.utils import get_entity_type, parse_csv_list
 from SiemplifyDataModel import EntityTypes
-from TIPCommon.utils import get_entity_original_identifier
 from SiemplifyUtils import convert_dict_to_json_result_dict
+from TIPCommon.extraction import extract_action_param
+from TIPCommon.utils import get_entity_original_identifier
 
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {CREATE_OBSERVABLES_SCRIPT_NAME}"
@@ -30,6 +30,7 @@ entity_type_mapper = {
     EntityTypes.EMAILMESSAGE: "email-message",
     EMAIL_ENTITY_TYPE: "email-addr",
 }
+
 
 class CreateObservables(BaseAction):
     def __init__(self, script_name: str) -> None:
@@ -138,6 +139,7 @@ class CreateObservables(BaseAction):
                 f" in {CREATE_OBSERVABLES_SCRIPT_NAME}."
             )
 
+
 def main() -> None:
     """Entry point for executing the "Create Observables" action script.
 
@@ -145,6 +147,7 @@ def main() -> None:
     the predefined script name and triggers its execution.
     """
     CreateObservables(CREATE_OBSERVABLES_SCRIPT_NAME).run()
+
 
 if __name__ == "__main__":
     main()

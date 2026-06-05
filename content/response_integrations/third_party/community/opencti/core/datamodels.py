@@ -1,12 +1,14 @@
 from __future__ import annotations
-from TIPCommon.transformation import dict_to_flat, add_prefix_to_dict
-from soar_sdk.SiemplifyUtils import flat_dict_to_csv, dict_to_flat
+
+from soar_sdk.SiemplifyUtils import dict_to_flat
+from TIPCommon.transformation import add_prefix_to_dict, dict_to_flat
 
 from .constants import (
-    YELLOW_COLOR,
-    RED_COLOR,
     GREEN_COLOR,
+    RED_COLOR,
+    YELLOW_COLOR,
 )
+
 
 class BaseModel:
     """
@@ -24,6 +26,7 @@ class BaseModel:
 
     def to_enrichment_data(self, prefix=None):
         data = dict_to_flat(self.raw_data)
+
 
 class ObservableObject(BaseModel):
     def __init__(
@@ -95,17 +98,18 @@ class ObservableObject(BaseModel):
             if self.score >= 50 and self.score <= 100:
                 status_color = RED_COLOR
 
-        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score  or "N/A"}</strong></span>'
-        content += f'<br><strong>Type:</strong> {self.entity_type  or "N/A"}'
-        content += f'<br><strong>TLP:</strong> {self.object_markings  or "N/A"}'
-        content += f'<br><strong>Created At:</strong> {self.created_at  or "N/A"}'
-        content += f'<br><strong>Updated At:</strong> {self.updated_at  or "N/A"}'
+        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score or "N/A"}</strong></span>'
+        content += f'<br><strong>Type:</strong> {self.entity_type or "N/A"}'
+        content += f'<br><strong>TLP:</strong> {self.object_markings or "N/A"}'
+        content += f'<br><strong>Created At:</strong> {self.created_at or "N/A"}'
+        content += f'<br><strong>Updated At:</strong> {self.updated_at or "N/A"}'
         content += "<br>"
-        content += f'<br><strong>Source: </strong><a href={self.link} target="_blank">{self.link  or "N/A"}</a>'
+        content += f'<br><strong>Source: </strong><a href={self.link} target="_blank">{self.link or "N/A"}</a>'
         content += "</body>"
         content += "<p>&nbsp;</p>"
 
         return content
+
 
 class IndicatorObject(BaseModel):
     def __init__(
@@ -192,7 +196,7 @@ class IndicatorObject(BaseModel):
         content = f"<br><strong>Indicator:</strong> {self.name}<br>"
         content += "<body>"
         
-        content += f'<br><strong>Description:</strong> {self.description  or "N/A"}'
+        content += f'<br><strong>Description:</strong> {self.description or "N/A"}'
         status_color = YELLOW_COLOR
         if self.score:
             if self.score >= 0 and self.score < 10:
@@ -204,7 +208,7 @@ class IndicatorObject(BaseModel):
             if self.score >= 50 and self.score <= 100:
                 status_color = RED_COLOR
 
-        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score  or "N/A"}</strong></span>'
+        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score or "N/A"}</strong></span>'
         content += f'<br><strong>Detection:</strong> {self.detection or "N/A"}'
         content += f'<br><strong>Revoked:</strong> {self.revoked or "N/A"}'
         content += f'<br><strong>Valid From:</strong> {self.valid_from or "N/A"}'

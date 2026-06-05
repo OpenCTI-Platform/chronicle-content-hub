@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import base64
 import ipaddress
 import re
 from zoneinfo import ZoneInfo
+
+from constants import EMAIL_ENTITY_TYPE, EMAIL_REGEX
 from dateutil import parser as dtparser
+from SiemplifyDataModel import EntityTypes
 from TIPCommon.types import Entity
 from TIPCommon.utils import get_entity_original_identifier
-from constants import EMAIL_REGEX, EMAIL_ENTITY_TYPE
-from SiemplifyDataModel import EntityTypes
-
 
 regex_sha512 = r"[0-9a-fA-F]{128}"
 regex_sha256 = r"[0-9a-fA-F]{64}"
@@ -89,6 +88,7 @@ def get_entity_type(entity: Entity) -> str:
 
     return entity.entity_type
 
+
 def prepare_hash_identifier(identifier: str) -> str:
     """Normalized the given identifier by converting it to lowercase.
 
@@ -100,6 +100,7 @@ def prepare_hash_identifier(identifier: str) -> str:
 
     """
     return identifier.lower()
+
 
 def prepare_entity_for_manager(entity: Entity) -> str:
     """Prepare an entity's identifier for the manager based on its type.

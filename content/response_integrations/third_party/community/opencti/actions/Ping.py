@@ -1,7 +1,7 @@
 from __future__ import annotations
+
 from core.base_action import BaseAction
 from core.constants import INTEGRATION_NAME, PING_SCRIPT_NAME
-
 
 SUCCESS_MESSAGE = (
     f"Successfully connected to the {INTEGRATION_NAME} server with the "

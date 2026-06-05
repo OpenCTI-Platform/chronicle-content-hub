@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from .datamodels import ObservableObject, IndicatorObject
-from constants import IOC_MAPPING
 import datamodels_bis
+from constants import IOC_MAPPING
 from TIPCommon.types import SingleJson
+
+from .datamodels import IndicatorObject, ObservableObject
 
 
 class OpenCTIParser:

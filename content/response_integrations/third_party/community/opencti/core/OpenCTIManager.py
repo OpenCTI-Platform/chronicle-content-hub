@@ -1,8 +1,11 @@
 from __future__ import annotations
-from pycti import OpenCTIApiClient, CaseIncident, CaseRfi, Incident
-from .utils import is_ipv4, get_hash_type
-from .OpenCTIParser import OpenCTIParser
+
+from pycti import CaseIncident, CaseRfi, Incident, OpenCTIApiClient
+
 from .constants import DEFAULT_LABEL_COLOR
+from .OpenCTIParser import OpenCTIParser
+from .utils import get_hash_type, is_ipv4
+
 
 class OpenCTIManagerAPI(object):
     
@@ -102,7 +105,7 @@ class OpenCTIManagerAPI(object):
             return result
         else:
             print("je suis la")
-            link = self.url+"/dashboard/id/"+result["id"]
+            link = self.url + "/dashboard/id/" + result["id"]
             return self.parser.build_observable_object(raw_data=result, observable_type=observable_type, observable=observable, link=link)
 
     def search_indicator(self, value):
@@ -122,9 +125,8 @@ class OpenCTIManagerAPI(object):
         if indicator is None:
             return None
         else:
-            link = self.url+"/dashboard/id/"+indicator["id"]
+            link = self.url + "/dashboard/id/" + indicator["id"]
             return self.parser.build_siemplify_indicator_object(indicator, link)
-
 
     def create_observable(self, obs_value, obs_type, obs_desc=None, obs_labels=[], obs_score=None, marking_str=None, create_indicator=False):
         """

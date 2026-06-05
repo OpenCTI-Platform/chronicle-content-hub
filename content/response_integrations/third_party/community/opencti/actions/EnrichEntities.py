@@ -1,17 +1,13 @@
-from TIPCommon.transformation import flat_dict_to_csv, construct_csv
-
-from TIPCommon.base.action import ExecutionState
-from core.base_action import BaseAction
 
 from core import utils
+from core.base_action import BaseAction
 from core.constants import ENRICH_ENTITIES_SCRIPT_NAME, INTEGRATION_NAME
-from core.utils import parse_csv_list, get_entity_type, prepare_entity_for_manager
-from TIPCommon.extraction import extract_action_param
-from datetime import datetime, timezone
+from core.utils import get_entity_type, prepare_entity_for_manager
 from SiemplifyDataModel import EntityTypes
+from SiemplifyUtils import convert_dict_to_json_result_dict
+from TIPCommon.base.action import ExecutionState
+from TIPCommon.transformation import construct_csv
 from TIPCommon.utils import get_entity_original_identifier
-from SiemplifyUtils import convert_dict_to_json_result_dict, unix_now
-from core.OpenCTIParser import OpenCTIParser
 
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {ENRICH_ENTITIES_SCRIPT_NAME}"
@@ -35,8 +31,8 @@ SUPPORTED_ENTITY_TYPES = [
     EntityTypes.DOMAIN,
     EntityTypes.CVE,
     EntityTypes.THREATACTOR,
-    #EntityTypes.FILENAME,
-    #EntityTypes.EMAILMESSAGE
+    # EntityTypes.FILENAME,
+    # EntityTypes.EMAILMESSAGE
 ]
 
 RISK_ASSESSMENT_SUPPORTED = [
@@ -46,6 +42,7 @@ RISK_ASSESSMENT_SUPPORTED = [
     EntityTypes.HOSTNAME,
     EntityTypes.DOMAIN,
 ]
+
 
 class EnrichEntities(BaseAction):
 
@@ -127,14 +124,14 @@ class EnrichEntities(BaseAction):
             )
             self.result_value = False
 
-        #self._finalize_action(suitable_entities)
+        # self._finalize_action(suitable_entities)
 
     def _process_entity(self, entity):
         """
         :param entity:
         :return:
         """
-        self.logger.info(f"-----------------------------------")
+        self.logger.info("-----------------------------------")
         self.logger.info(f"Going to process entity: {entity}")
 
         entity_identifier = get_entity_original_identifier(entity)
@@ -149,20 +146,20 @@ class EnrichEntities(BaseAction):
 
         observable_data = self.api_client.search_observable(observable=identifier, observable_type=observable_type)
 
-        #self.logger.info(f"Data from OpenCTI: {observable_data}")
-        #import json
-        #self.logger.info(f"Data from OpenCTI (JSON: {json.dumps(observable_data.to_json())}")
+        # self.logger.info(f"Data from OpenCTI: {observable_data}")
+        # import json
+        # self.logger.info(f"Data from OpenCTI (JSON: {json.dumps(observable_data.to_json())}")
 
-        #self.entities_existing_data[entity_identifier] = observable_data.to_json_shorten(
+        # self.entities_existing_data[entity_identifier] = observable_data.to_json_shorten(
         #    get_entity_type(entity)
-        #)
-        #self.successful_entities.append(entity_identifier)
+        # )
+        # self.successful_entities.append(entity_identifier)
 
         self.logger.info(f"OpenCTI Observable data: {observable_data}")
 
         if observable_data and observable_data.raw_data:
 
-            self.logger.info(f"OK ca marche")
+            self.logger.info("OK ca marche")
 
             self.json_results[entity.identifier] = observable_data.to_enrichment_data()
 
@@ -348,6 +345,7 @@ class EnrichEntities(BaseAction):
             self.result_value = False
         '''
 
+
 def main() -> None:
     """Entry point for executing the "Enrich Entities" action script.
 
@@ -355,6 +353,7 @@ def main() -> None:
     the predefined script name and triggers its execution.
     """
     EnrichEntities(ENRICH_ENTITIES_SCRIPT_NAME).run()
+
 
 if __name__ == "__main__":
     main()

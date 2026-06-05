@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import dataclasses
-from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
-from SiemplifyDataModel import EntityTypes
-from SiemplifyUtils import convert_string_to_unix_time
+from core.constants import ENRICHMENT_PREFIX, GREEN_COLOR, RED_COLOR, YELLOW_COLOR
 from TIPCommon.transformation import add_prefix_to_dict, dict_to_flat
 from TIPCommon.types import SingleJson
-from core.constants import YELLOW_COLOR, GREEN_COLOR, RED_COLOR, ENRICHMENT_PREFIX
 
-#from constants import (
+# from constants import (
 #    CASE_WALL_LINK,
 #    COLLECTIONS_CASE_WALL_LINK,
 #    DATA_ENRICHMENT_PREFIX,
@@ -32,6 +29,7 @@ class BaseModel:
     def to_flat(self) -> dict[str, Any]:
         return dict_to_flat(self.to_json()["raw_data"])
 
+
 @dataclasses.dataclass(frozen=True)
 class BaseObject(BaseModel):
     """Class to create data model for Base Object"""
@@ -48,6 +46,7 @@ class BaseObject(BaseModel):
 
         """
         return cls(raw_data=raw_data)
+
 
 @dataclasses.dataclass(frozen=True)
 class Observable(BaseModel):
@@ -133,13 +132,13 @@ class Observable(BaseModel):
             if self.score >= 50 and self.score <= 100:
                 status_color = RED_COLOR
 
-        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score  or "N/A"}</strong></span>'
-        content += f'<br><strong>Type:</strong> {self.entity_type  or "N/A"}'
-        content += f'<br><strong>Markings:</strong> {self.markings  or "N/A"}'
-        content += f'<br><strong>Created At:</strong> {self.created_at  or "N/A"}'
-        content += f'<br><strong>Updated At:</strong> {self.updated_at  or "N/A"}'
+        content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score or "N/A"}</strong></span>'
+        content += f'<br><strong>Type:</strong> {self.entity_type or "N/A"}'
+        content += f'<br><strong>Markings:</strong> {self.markings or "N/A"}'
+        content += f'<br><strong>Created At:</strong> {self.created_at or "N/A"}'
+        content += f'<br><strong>Updated At:</strong> {self.updated_at or "N/A"}'
         content += "<br>"
-        content += f'<br><strong>Source: </strong><a href={self.link} target="_blank">{self.link  or "N/A"}</a>'
+        content += f'<br><strong>Source: </strong><a href={self.link} target="_blank">{self.link or "N/A"}</a>'
         content += "</body>"
         content += "<p>&nbsp;</p>"
 
@@ -155,7 +154,7 @@ class Observable(BaseModel):
             k: v for k, v in self.get_enrichment_data().items() if v
         }
 
-        #if widget_link:
+        # if widget_link:
         #    clean_enrichment_data["widget_link"] = widget_link
 
         return add_prefix_to_dict(clean_enrichment_data, ENRICHMENT_PREFIX)
@@ -256,6 +255,7 @@ class URL(Observable):
 
         return enrichment_data
 
+
 @dataclasses.dataclass(frozen=True)
 class IP(Observable):
     """Class to create data model for IP object"""
@@ -324,6 +324,7 @@ class IP(Observable):
         }
 
         return enrichment_data
+
 
 @dataclasses.dataclass(frozen=True)
 class Domain(Observable):

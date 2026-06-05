@@ -1,10 +1,10 @@
 from core.base_action import BaseAction
 from core.constants import ADD_OBJECT_TO_CONTAINER_SCRIPT_NAME
-from core.utils import parse_csv_list
 from TIPCommon.extraction import extract_action_param
 
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {ADD_OBJECT_TO_CONTAINER_SCRIPT_NAME}"
+
 
 class AddObjectToContainer(BaseAction):
     def __init__(self, script_name: str) -> None:
@@ -72,6 +72,7 @@ class AddObjectToContainer(BaseAction):
             f"Object.id {self.params.object_id} successfully added in container {self.params.container_type} with id {self.params.container_id}"
         )
 
+
 def main() -> None:
     """Entry point for executing the "Add Object To Container" action script.
 
@@ -79,6 +80,7 @@ def main() -> None:
     the predefined script name and triggers its execution.
     """
     AddObjectToContainer(ADD_OBJECT_TO_CONTAINER_SCRIPT_NAME).run()
+
 
 if __name__ == "__main__":
     main()
