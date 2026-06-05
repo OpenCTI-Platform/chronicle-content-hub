@@ -4,7 +4,7 @@ from TIPCommon.base.action import ExecutionState
 from core.base_action import BaseAction
 
 from core import utils
-from core.constants import ENRICH_ENTITIES_SCRIPT_NAME
+from core.constants import ENRICH_ENTITIES_SCRIPT_NAME, INTEGRATION_NAME
 from core.utils import parse_csv_list, get_entity_type, prepare_entity_for_manager
 from TIPCommon.extraction import extract_action_param
 from datetime import datetime, timezone
@@ -16,13 +16,15 @@ from core.OpenCTIParser import OpenCTIParser
 SUCCESS_MESSAGE = ""
 ERROR_MESSAGE = f"Error executing action {ENRICH_ENTITIES_SCRIPT_NAME}"
 
-# Not usefull
 ENTITY_TYPE_MAP = {
-    EntityTypes.FILEHASH: "files",
-    EntityTypes.URL: "urls",
-    EntityTypes.ADDRESS: "ip_addresses",
-    EntityTypes.HOSTNAME: "domains",
-    EntityTypes.DOMAIN: "domains",
+    EntityTypes.FILEHASH: "hash",
+    EntityTypes.URL: "url",
+    EntityTypes.ADDRESS: "ip",
+    EntityTypes.HOSTNAME: "hostname",
+    EntityTypes.DOMAIN: "domain-name",
+    EntityTypes.USER: "email-addr",
+    EntityTypes.FILENAME: "filename",
+    EntityTypes.EMAILMESSAGE: "email-message",
 }
 
 SUPPORTED_ENTITY_TYPES = [
@@ -36,17 +38,6 @@ SUPPORTED_ENTITY_TYPES = [
     #EntityTypes.FILENAME,
     #EntityTypes.EMAILMESSAGE
 ]
-
-entity_type_mapper = {
-    EntityTypes.HOSTNAME: "hostname",
-    EntityTypes.URL: "url",
-    EntityTypes.FILEHASH: "file",
-    EntityTypes.ADDRESS: "ip",
-    EntityTypes.USER: "email-addr",
-    EntityTypes.FILENAME: "filename",
-    EntityTypes.DOMAIN: "domain",
-    #EntityTypes.EMAILMESSAGE: "email-message"
-}
 
 RISK_ASSESSMENT_SUPPORTED = [
     EntityTypes.ADDRESS,
@@ -91,7 +82,50 @@ class EnrichEntities(BaseAction):
         self.logger.info(f"suitable entities: {suitable_entities}")
 
         for entity in suitable_entities:
-            self._process_entity(entity)
+            try:
+                self._process_entity(entity)
+            except Exception as err:
+                self.logger.error(f"Error processing entity {entity.identifier}: {err}")
+                self.logger.exception(err)
+                self.failed_entities.append(entity.identifier)
+                self.entities_existing_data[entity.identifier] = {
+                    "execution_status": str(err),
+                }
+
+        self.logger.info(f"successful_entities: {self.successful_entities}")
+
+        self.logger.info("before")
+        self.logger.info(self.json_results)
+        self.json_results = convert_dict_to_json_result_dict(self.json_results)
+        self.logger.info("after")
+        self.logger.info(self.json_results)
+
+        if self.successful_entities:
+
+            original_identifiers = [
+                get_entity_original_identifier(entity) for entity in self.successful_entities
+            ]
+            self.output_message += (
+                f"Successfully enriched the "
+                f"following entities using  "
+                f"{INTEGRATION_NAME}: \n "
+                f"{', '.join(original_identifiers)} \n"
+            )
+            self.soar_action.update_entities(self.successful_entities)
+
+        if self.failed_entities:
+            self.output_message += (
+                f"The action wasn’t able to enrich the "
+                f"following entities using "
+                f"{INTEGRATION_NAME}: "
+                f"\n {', '.join(self.failed_entities)} \n"
+            )
+
+        if not self.successful_entities:
+            self.output_message = (
+                "The action didn’t enrich any of the provided entities."
+            )
+            self.result_value = False
 
         #self._finalize_action(suitable_entities)
 
@@ -111,6 +145,7 @@ class EnrichEntities(BaseAction):
 
         identifier = prepare_entity_for_manager(entity)
         observable_type = ENTITY_TYPE_MAP.get(get_entity_type(entity))
+        self.logger.info(f"OpenCTI Observable type: {observable_type}")
 
         observable_data = self.api_client.search_observable(observable=identifier, observable_type=observable_type)
 
@@ -123,9 +158,13 @@ class EnrichEntities(BaseAction):
         #)
         #self.successful_entities.append(entity_identifier)
 
+        self.logger.info(f"OpenCTI Observable data: {observable_data}")
+
         if observable_data and observable_data.raw_data:
 
-            self.json_results[entity.identifier] = observable_data.to_json()
+            self.logger.info(f"OK ca marche")
+
+            self.json_results[entity.identifier] = observable_data.to_enrichment_data()
 
             entity.additional_properties.update(
                 observable_data.to_enrichment_data()

@@ -64,24 +64,46 @@ class OpenCTIManagerAPI(object):
         :param raw_response:
         :return:
         """
-        result = self.opencti_api_client.stix_cyber_observable.read(
-            filters={
+        search_key = "value"
+
+        # Build filters if value is provided
+        if observable_type == "hash":
+            hash_type = get_hash_type(observable)
+            if hash_type == "md5":
+                search_key = "hashes.MD5"
+            if hash_type == "sha1":
+                search_key = "hashes.SHA-1"
+            if hash_type == "sha256":
+                search_key = "hashes.SHA-256"
+            if hash_type == "sha512":
+                search_key = "hashes.SHA-512"
+
+        filters = None
+        if observable:
+            filters = {
                 "mode": "and",
-                "filters": [{"key": "value", "values": [observable]}],
+                "filters": [
+                    {
+                        "key": search_key,
+                        "values": [observable],
+                        "operator": "eq",
+                        "mode": "or",
+                    }
+                ],
                 "filterGroups": [],
             }
-        )
-        #if observable is None:
-        #    return None
-        #else:
-        #
-        #    return self.parser.build_siemplify_observable_object(observable, link)
 
-        print(result)
-        link = self.url+"/dashboard/id/"+result["id"]
-        if raw_response:
+        # Search observables
+        result = self.opencti_api_client.stix_cyber_observable.read(filters=filters)
+
+        if result is None:
+            return None
+        elif raw_response:
             return result
-        return self.parser.build_observable_object(raw_data=result, observable_type=observable_type, observable=observable, link=link)
+        else:
+            print("je suis la")
+            link = self.url+"/dashboard/id/"+result["id"]
+            return self.parser.build_observable_object(raw_data=result, observable_type=observable_type, observable=observable, link=link)
 
     def search_indicator(self, value):
         """
@@ -143,7 +165,7 @@ class OpenCTIManagerAPI(object):
                 "type": "domain-name",
                 "value": obs_value,
             }
-        if obs_type == "email-subject":
+        if obs_type == "email-message":
             observable_data = {
                 "type": "email-message",
                 "subject": obs_value,
@@ -194,6 +216,11 @@ class OpenCTIManagerAPI(object):
                         "sha-512": obs_value
                     }
                 }
+        if obs_type == "filename":
+            observable_data = {
+                "type": "directory",
+                "path": obs_value,
+            }
         if obs_score:
             obs_score = int(obs_score)
 
