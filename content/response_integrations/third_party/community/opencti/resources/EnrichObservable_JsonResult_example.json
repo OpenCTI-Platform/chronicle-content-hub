@@ -1,0 +1,44 @@
+{
+    "1.2.3.4": {
+        "entity": "1.2.3.4",
+        "entity_type": "ADDRESS",
+        "is_observable": true,
+        "observable_id": "f6e40920-4b5a-4e93-8b30-1a7c6bcde5a1",
+        "observable_type": "IPv4-Addr",
+        "score": 75,
+        "description": "Known C2 server used by APT29",
+        "created_by": "ANSSI",
+        "labels": ["c2", "apt29"],
+        "link": "https://demo.opencti.io/dashboard/id/f6e40920-4b5a-4e93-8b30-1a7c6bcde5a1",
+        "relations": [
+            {
+                "relation_type": "indicates",
+                "related_entity_type": "Indicator",
+                "related_entity_name": "[ipv4-addr:value = '1.2.3.4']"
+            },
+            {
+                "relation_type": "related-to",
+                "related_entity_type": "Domain-Name",
+                "related_entity_name": "evil.example.com"
+            },
+            {
+                "relation_type": "communicates-with",
+                "related_entity_type": "Malware",
+                "related_entity_name": "Cobalt Strike"
+            }
+        ]
+    },
+    "clean.example.org": {
+        "entity": "clean.example.org",
+        "entity_type": "HOSTNAME",
+        "is_observable": false,
+        "observable_id": null,
+        "observable_type": null,
+        "score": null,
+        "description": null,
+        "created_by": null,
+        "labels": [],
+        "link": null,
+        "relations": []
+    }
+}

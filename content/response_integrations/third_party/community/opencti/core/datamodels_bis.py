@@ -69,67 +69,18 @@ class Observable(BaseModel):
             }
         ]
 
-    '''
-    def to_json_shorten(
-            self,
-            entity_type: str | None = None,
-            comments: list[Comment] | None = None,
-            widget_link: str | None = None,
-            cached_html_widget: str | None = None,
-            sandboxes_data: dict[str, Sandbox] | None = None,
-            mitre_response: Mitre | None = None,
-            ai_summary_response=None,
-    ) -> SingleJson:
-        """Prepare shorten json data from raw data
-
-        Returns:
-            SingleJson: SingleJson data
-
-        """
-        if comments:
-            self.raw_data["comments"] = [comment.raw_data for comment in comments]
-        if sandboxes_data:
-            self.raw_data["sandboxes_data"] = {
-                key: value.raw_data if value else None
-                for key, value in sandboxes_data.items()
-            }
-        if mitre_response:
-            if mitre_response.mitre_tactics:
-                self.raw_data["related_mitre_tactics"] = mitre_response.mitre_tactics
-            if mitre_response.mitre_techniques:
-                self.raw_data["related_mitre_techniques"] = (
-                    mitre_response.mitre_techniques
-                )
-
-        if ai_summary_response:
-            self.raw_data["generated_ai_summary"] = ai_summary_response
-        if widget_link:
-            self.raw_data["widget_link"] = widget_link
-        if cached_html_widget:
-            self.raw_data["widget_html"] = cached_html_widget
-        if entity_type in [EntityTypes.THREATACTOR, EntityTypes.CVE]:
-            attributes = self.raw_data.get("attributes", {})
-            if entity_type == EntityTypes.THREATACTOR:
-                if "aggregations" in attributes:
-                    attributes.pop("aggregations")
-                attributes["threat_actor_id"] = self.raw_data.get("id", "")
-            return attributes
-
-        return self.raw_data
-    '''
-
     def to_insight(self):
         content = f"<br><strong>Entity:</strong> {self.value}<br>"
         content += "<body>"
         status_color = YELLOW_COLOR
         if self.score:
-            if self.score >= 0 and self.score < 10:
+            if 0 <= self.score < 10:
                 status_color = GREEN_COLOR
 
-            if self.score >= 10 and self.score < 50:
+            if 10 <= self.score < 50:
                 status_color = YELLOW_COLOR
 
-            if self.score >= 50 and self.score <= 100:
+            if 50 <= self.score <= 100:
                 status_color = RED_COLOR
 
         content += f'<br><strong>Score:</strong><span style="color: {status_color};"><strong> {self.score or "N/A"}</strong></span>'
@@ -391,6 +342,78 @@ class Domain(Observable):
             "markings": ", ".join(self.markings),
             "external_references": ", ".join(self.external_references),
             "link": self.link
+        }
+
+        return enrichment_data
+
+
+@dataclasses.dataclass(frozen=True)
+class Hash(Observable):
+    """Class to create data model for Hash (file) object"""
+
+    entity_type: str
+    value: str
+    description: str
+    entity_id: str
+    entity_stix_id: str
+    created_at: str
+    updated_at: str
+    author: str
+    creators: list
+    markings: list
+    labels: list
+    external_references: list
+    score: int
+    link: str
+
+    @classmethod
+    def from_json(cls, raw_data: dict, observable_type: str, observable: str, link: str) -> Hash:
+        """Create Hash object from raw JSON data.
+
+        Args:
+            raw_data (dict): raw data of Hash
+            observable_type (str): observable type
+            observable (str): observable identifier
+            link (str): link to the platform entity
+
+        Returns:
+            Hash: Hash object
+
+        """
+        # For file hashes, use the observable identifier as value since
+        # the raw_data stores hashes in the "hashes" dict, not "value".
+        return cls(
+            raw_data=raw_data,
+            entity_type=raw_data.get("entity_type", ""),
+            value=observable,
+            description=raw_data.get("x_opencti_description", ""),
+            entity_id=raw_data.get("id", ""),
+            entity_stix_id=raw_data.get("standard_id", ""),
+            created_at=raw_data.get("created_at", ""),
+            updated_at=raw_data.get("updated_at", ""),
+            author=(raw_data.get("createdBy") or {}).get("name", ""),
+            creators=[m.get("name") for m in raw_data.get("creators", [])],
+            markings=[m.get("definition") for m in raw_data.get("objectMarking", [])],
+            labels=[m.get("value") for m in raw_data.get("objectLabel", [])],
+            external_references=[m.get("url") for m in raw_data.get("externalReferences", [])],
+            score=raw_data.get("x_opencti_score", 0),
+            link=link,
+        )
+
+    def get_enrichment_data(self):
+        enrichment_data = {
+            "id": self.entity_id,
+            "stix_id": self.entity_stix_id,
+            "description": self.description,
+            "score": self.score,
+            "labels": ", ".join(self.labels),
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "author": self.author,
+            "creators": ", ".join(self.creators),
+            "markings": ", ".join(self.markings),
+            "external_references": ", ".join(self.external_references),
+            "link": self.link,
         }
 
         return enrichment_data

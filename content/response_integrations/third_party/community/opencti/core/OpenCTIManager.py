@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from pycti import CaseIncident, CaseRfi, Incident, OpenCTIApiClient
 
-from .constants import DEFAULT_LABEL_COLOR
+from .constants import DEFAULT_LABEL_COLOR, SOAR_TO_OPENCTI_SCO_TYPE
+from .datamodels import (
+    EntityEnrichmentResult2,
+    IndicatorEnrichmentResult,
+    ObservableEnrichmentResult,
+)
 from .OpenCTIParser import OpenCTIParser
 from .utils import get_hash_type, is_ipv4
 
@@ -411,3 +416,215 @@ class OpenCTIManagerAPI(object):
         )
         return result
 
+    # ------------------------------------------------------------------
+    #  EnrichEntities2 — lightweight triage (score only, no relations)
+    # ------------------------------------------------------------------
+
+    def enrich_entity2(
+        self,
+        identifier: str,
+        entity_type: str,
+        search_observables: bool = True,
+        search_indicators: bool = True,
+    ) -> EntityEnrichmentResult2:
+        """Perform a lightweight double-lookup (Observable + Indicator).
+
+        Each lookup is independent — a failure in one does not block the other.
+        """
+        result = EntityEnrichmentResult2(
+            entity_identifier=identifier,
+            entity_type=entity_type,
+        )
+
+        if search_observables:
+            try:
+                self._lookup_observable_score(result, identifier, entity_type)
+            except Exception:
+                pass  # logged by caller
+
+        if search_indicators:
+            try:
+                self._lookup_indicator_score(result, identifier)
+            except Exception:
+                pass
+
+        return result
+
+    def _lookup_observable_score(
+        self,
+        result: EntityEnrichmentResult2,
+        identifier: str,
+        entity_type: str,
+    ) -> None:
+        """Fill *result* with Observable (SCO) score via ``pycti``."""
+        filters = self._build_observable_filters(identifier, entity_type)
+        if filters is None:
+            return
+
+        data = self.opencti_api_client.stix_cyber_observable.read(filters=filters)
+        if data:
+            result.is_observable = True
+            result.observable_score = data.get("x_opencti_score")
+
+    def _lookup_indicator_score(
+        self,
+        result: EntityEnrichmentResult2,
+        identifier: str,
+    ) -> None:
+        """Fill *result* with Indicator (SDO) score via ``pycti`` (search by name)."""
+        data = self.opencti_api_client.indicator.read(
+            filters={
+                "mode": "and",
+                "filters": [{"key": "name", "values": [identifier]}],
+                "filterGroups": [],
+            }
+        )
+        if data:
+            result.is_indicator = True
+            result.indicator_score = data.get("x_opencti_score")
+            result.indicator_confidence = data.get("confidence")
+
+    # ------------------------------------------------------------------
+    #  EnrichObservable — full SCO enrichment with all relationships
+    # ------------------------------------------------------------------
+
+    def enrich_observable(
+        self,
+        identifier: str,
+        entity_type: str,
+    ) -> ObservableEnrichmentResult:
+        """Full enrichment of an Observable (SCO): metadata + all relations."""
+
+        filters = self._build_observable_filters(identifier, entity_type)
+        if filters is None:
+            return None
+
+        data = self.opencti_api_client.stix_cyber_observable.read(filters=filters)
+        if not data:
+            return None
+
+        link = self.url + "/dashboard/id/" + data["id"]
+        result = ObservableEnrichmentResult.from_raw_data(
+            raw_data=data,
+            identifier=identifier,
+            entity_type=entity_type,
+            link=link,
+        )
+
+        # Resolve all relationships
+        try:
+            result.relations = self._resolve_relationships(data["id"])
+        except Exception:
+            pass
+
+        return result
+
+    # ------------------------------------------------------------------
+    #  EnrichIndicator — full SDO enrichment with all relationships
+    # ------------------------------------------------------------------
+
+    def enrich_indicator(
+        self,
+        identifier: str,
+    ) -> IndicatorEnrichmentResult:
+        """Full enrichment of an Indicator (SDO) by name: metadata + all relations."""
+
+        data = self.opencti_api_client.indicator.read(
+            filters={
+                "mode": "and",
+                "filters": [{"key": "name", "values": [identifier]}],
+                "filterGroups": [],
+            }
+        )
+        if not data:
+            return IndicatorEnrichmentResult(entity_identifier=identifier)
+
+        link = self.url + "/dashboard/id/" + data["id"]
+        result = IndicatorEnrichmentResult.from_raw_data(
+            raw_data=data,
+            identifier=identifier,
+            link=link,
+        )
+
+        # Resolve all relationships
+        try:
+            result.relations = self._resolve_relationships(data["id"])
+        except Exception:
+            pass
+
+        return result
+
+    # ------------------------------------------------------------------
+    #  Shared helpers
+    # ------------------------------------------------------------------
+
+    def _build_observable_filters(self, identifier: str, entity_type: str) -> dict | None:
+        """Build pycti filter dict for a StixCyberObservable lookup."""
+        search_key = "value"
+
+        # Handle file hashes
+        if entity_type == "FILEHASH":
+            hash_type = get_hash_type(identifier)
+            hash_key_map = {
+                "md5": "hashes.MD5",
+                "sha1": "hashes.SHA-1",
+                "sha256": "hashes.SHA-256",
+                "sha512": "hashes.SHA-512",
+            }
+            if hash_type and hash_type in hash_key_map:
+                search_key = hash_key_map[hash_type]
+            else:
+                return None
+        elif entity_type not in SOAR_TO_OPENCTI_SCO_TYPE:
+            return None
+
+        return {
+            "mode": "and",
+            "filters": [
+                {
+                    "key": search_key,
+                    "values": [identifier],
+                    "operator": "eq",
+                    "mode": "or",
+                }
+            ],
+            "filterGroups": [],
+        }
+
+    def _resolve_relationships(self, entity_id: str) -> list[dict]:
+        """Fetch all ``stixCoreRelationships`` for the given entity via ``pycti``.
+
+        Uses ``getAll=True`` to paginate through all results.
+        Returns a normalised list of dicts.
+        """
+        raw_relations = self.opencti_api_client.stix_core_relationship.list(
+            fromOrToId=entity_id,
+            getAll=True,
+        )
+
+        relations: list[dict] = []
+        for rel in (raw_relations or []):
+            from_obj = rel.get("from") or {}
+            to_obj = rel.get("to") or {}
+
+            # Determine the related entity (the one that is NOT entity_id)
+            if from_obj.get("id") == entity_id:
+                related = to_obj
+            else:
+                related = from_obj
+
+            # Extract a human-readable name for the related entity
+            related_name = (
+                related.get("name")
+                or related.get("observable_value")
+                or related.get("value")
+                or related.get("id", "?")
+            )
+
+            relations.append({
+                "relation_type": rel.get("relationship_type", "unknown"),
+                "related_entity_type": related.get("entity_type", ""),
+                "related_entity_name": related_name,
+            })
+
+        return relations
